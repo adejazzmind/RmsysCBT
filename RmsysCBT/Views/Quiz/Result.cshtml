@@ -1,0 +1,13 @@
+﻿<h2 class="text-center">
+    @(ViewBag.IsCorrect ? "Correct 🎉" : "Wrong ❌")
+</h2>
+
+<p><strong>Question:</strong> @ViewBag.Question</p>
+<p><strong>Your Answer:</strong> @ViewBag.SelectedOption</p>
+
+@if (!(bool)ViewBag.IsCorrect)
+{
+    <p><strong>Correct Answer:</strong> @ViewBag.CorrectAnswer</p>
+}
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Back to Questions</a>
