@@ -1,34 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
-using RMSYSCBT.Models;
+using Microsoft.EntityFrameworkCore;
+using RmsysCBT.Data;
+using RmsysCBT.Models;
 using System.Diagnostics;
 
-namespace RMSYSCBT.Controllers;
-
-public class HomeController : Controller
+namespace RmsysCBT.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController : Controller
     {
-        _logger = logger;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel
+        // Inject the Database Context
+        public HomeController(ApplicationDbContext context)
         {
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
-        });
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            // FIX: Fetch the tests from the DB so 'Model' is not null in the View
+            // This prevents the NullReferenceException
+            var tests = await _context.Tests.ToListAsync();
+            return View(tests);
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 }

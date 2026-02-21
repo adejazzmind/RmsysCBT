@@ -1,0 +1,30 @@
+﻿@model RmsysCBT.Models.TestResult
+@{
+    ViewData["Title"] = "Results";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header border-0 py-4 @(Model.Passed ? "bg-success" : "bg-danger") text-white">
+                    <h1 class="display-1 mb-0"><i class="bi @(Model.Passed ? "bi-trophy-fill" : "bi-x-circle")"></i></h1>
+                    <h2 class="mt-2">@(Model.Passed ? "Excellent Work!" : "Try Again")</h2>
+                </div>
+                <div class="card-body p-5">
+                    <h3 class="text-muted mb-4">Your Score</h3>
+                    <div class="display-3 fw-bold mb-2 @(Model.Passed ? "text-success" : "text-danger")">
+                        @Model.Percentage%
+                    </div>
+                    <p class="fs-4 text-muted">You got <strong>@Model.Score</strong> out of <strong>@Model.TotalQuestions</strong> questions correct.</p>
+
+                    <hr class="my-4">
+
+                    <a href="/Test/Index" class="btn btn-outline-primary btn-lg rounded-pill px-5">
+                        Take Another Test
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

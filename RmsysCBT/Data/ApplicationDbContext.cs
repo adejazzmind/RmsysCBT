@@ -1,13 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RMSYSCBT.Models.Entities;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using RmsysCBT.Models;
 
-namespace RMSYSCBT.Data;
-
-public class ApplicationDbContext : DbContext
+namespace RmsysCBT.Data
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options) { }
+    public class ApplicationDbContext : IdentityDbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options) { }
 
-    public DbSet<Question> Questions => Set<Question>();
-    public DbSet<Option> Options => Set<Option>();
+        public DbSet<Test> Tests { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Option> Options { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
+    }
 }
