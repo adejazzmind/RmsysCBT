@@ -5,40 +5,53 @@ using RmsysCBT.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Setup In-Memory Database
+// ================================
+// DATABASE (SQLite)
+// ================================
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("RmsysCBT_Db"));
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    )
+);
 
-// 2. Identity with Roles (Updated)
+// ================================
+// IDENTITY
+// ================================
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 4; // Easy password for testing
+    options.Password.RequiredLength = 4;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders()
 .AddDefaultUI();
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); // Required for Login/Register pages
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// 3. Seed Data (Admin User & Questions)
+// ================================
+// AUTO MIGRATE + SEED
+// ================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
+
+    // Create database if missing
+    context.Database.Migrate();
+
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-    // Pass user/role managers to seeder
-    DbInitializer.Initialize(context, userManager, roleManager).Wait();
+    await DbInitializer.Initialize(context, userManager, roleManager);
 }
 
+// ================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -47,16 +60,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.UseAuthentication(); // Verify Identity
-app.UseAuthorization();  // Check Access
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages(); // Activate Login Pages
-
+app.MapRazorPages();
 app.Run();
