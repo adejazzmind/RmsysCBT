@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RmsysCBT.Data;
 using RmsysCBT.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RmsysCBT.Controllers
 {
+    [Authorize]
     public class TestController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -14,101 +19,115 @@ namespace RmsysCBT.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        // 1. View all available exams
+        public IActionResult Index()
         {
-            return View(await _context.Tests.ToListAsync());
+            var tests = _context.Tests.ToList();
+            return View(tests);
         }
 
-        public async Task<IActionResult> Take(Guid id)
+        // 2. View student's past exam history
+        public IActionResult History()
         {
-            var test = await _context.Tests.FindAsync(id);
+            var userName = User.Identity?.Name;
+
+            // Uses StudentName to match your model perfectly
+            var history = _context.TestResults
+                                  .Where(tr => tr.StudentName == userName)
+                                  .ToList();
+            return View(history);
+        }
+
+        // 3. Take a specific exam
+        public IActionResult Take(Guid id)
+        {
+            var test = _context.Tests
+                               .Include(t => t.Questions)
+                               .ThenInclude(q => q.Options)
+                               .FirstOrDefault(t => t.Id == id);
+
             if (test == null) return NotFound();
-
-            var questions = await _context.Questions
-                .Include(q => q.Options)
-                .Where(q => q.TestId == id)
-                .ToListAsync();
-
-            // OPTION A: RANDOMIZATION (Shuffle Questions)
-            questions = questions.OrderBy(x => Guid.NewGuid()).ToList();
-
-            // Shuffle Options inside each question
-            foreach (var q in questions)
-            {
-                q.Options = q.Options.OrderBy(x => Guid.NewGuid()).ToList();
-            }
 
             ViewBag.TestTitle = test.Title;
             ViewBag.Duration = test.DurationMinutes;
             ViewBag.TestId = test.Id;
 
-            return View(questions);
+            return View(test.Questions);
         }
 
+        // 4. Grade the exam and save to database
         [HttpPost]
-        public async Task<IActionResult> Submit(Guid testId, Dictionary<Guid, Guid> answers)
+        [ValidateAntiForgeryToken]
+        public IActionResult Submit(Guid testId, Dictionary<Guid, Guid> answers)
         {
-            var questions = await _context.Questions
-                .Where(q => q.TestId == testId)
-                .ToListAsync();
+            var test = _context.Tests
+                               .Include(t => t.Questions)
+                               .FirstOrDefault(t => t.Id == testId);
+
+            if (test == null) return NotFound();
 
             int score = 0;
-            // OPTION C: ANALYTICS PREP
-            var sectionScores = new Dictionary<string, int>();
-            var sectionTotals = new Dictionary<string, int>();
+            int totalQuestions = test.Questions.Count;
 
-            foreach (var q in questions)
+            if (answers != null)
             {
-                // Initialize section counters
-                if (!sectionTotals.ContainsKey(q.Section))
+                foreach (var question in test.Questions)
                 {
-                    sectionTotals[q.Section] = 0;
-                    sectionScores[q.Section] = 0;
-                }
-                sectionTotals[q.Section]++;
-
-                if (answers.ContainsKey(q.Id) && answers[q.Id] == q.CorrectOptionId)
-                {
-                    score++;
-                    sectionScores[q.Section]++;
+                    if (answers.TryGetValue(question.Id, out Guid selectedOptionId))
+                    {
+                        if (question.CorrectOptionId == selectedOptionId)
+                        {
+                            score++;
+                        }
+                    }
                 }
             }
 
-            var result = new TestResult
+            // Create the result perfectly matching your AppModels.cs properties
+            var testResult = new TestResult
             {
+                Id = Guid.NewGuid(),
                 TestId = testId,
+                StudentName = User.Identity?.Name ?? "Guest Student",
                 Score = score,
-                TotalQuestions = questions.Count,
-                StudentName = User.Identity?.Name ?? "Guest Student"
+                TotalQuestions = totalQuestions,
+                TakenOn = DateTime.UtcNow
             };
 
-            _context.TestResults.Add(result);
-            await _context.SaveChangesAsync();
+            _context.TestResults.Add(testResult);
+            _context.SaveChanges();
 
-            // Pass Analytics to View using ViewBag
-            ViewBag.SectionScores = sectionScores;
-            ViewBag.SectionTotals = sectionTotals;
-
-            return View("Result", result);
+            return RedirectToAction("Result", new { id = testResult.Id });
         }
 
-        // OPTION D: CERTIFICATE GENERATION
-        public IActionResult Certificate(Guid resultId)
+        // 5. Show the Result immediately after taking the exam
+        public IActionResult Result(Guid id)
         {
-            // In a real app, fetch from DB. Mocking for now to ensure it works instantly.
-            var model = new TestResult
+            var userName = User.Identity?.Name;
+
+            var result = _context.TestResults
+                                 .FirstOrDefault(tr => tr.Id == id && tr.StudentName == userName);
+
+            if (result == null) return NotFound();
+
+            return View(result);
+        }
+
+        // 6. Show the Elite Certificate
+        public IActionResult Certificate(Guid id)
+        {
+            var userName = User.Identity?.Name;
+
+            var result = _context.TestResults
+                                 .FirstOrDefault(tr => tr.Id == id && tr.StudentName == userName);
+
+            if (result == null)
             {
-                StudentName = User.Identity?.Name ?? "Guest Student",
-                Score = 40, // Mock score for display
-                TotalQuestions = 50,
-                TakenOn = DateTime.Now
-            };
+                return NotFound();
+            }
 
-            // Try to find real result if available
-            var realResult = _context.TestResults.FirstOrDefault(r => r.Id == resultId);
-            if (realResult != null) model = realResult;
-
-            return View(model);
+            // We deleted the Percentage check here! Let everyone see the certificate for testing.
+            return View(result);
         }
     }
 }

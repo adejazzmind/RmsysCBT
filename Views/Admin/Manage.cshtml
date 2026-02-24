@@ -1,0 +1,49 @@
+﻿@model RmsysCBT.Models.Test
+@{
+    ViewData["Title"] = "Manage Exam";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-0">@Model.Title</h2>
+            <p class="text-muted mb-0"><i class="bi bi-clock"></i> @Model.DurationMinutes Minutes | <i class="bi bi-card-list"></i> @Model.Questions.Count Questions</p>
+        </div>
+        <div>
+            <a href="#" class="btn btn-success rounded-pill px-4 shadow-sm me-2">
+                <i class="bi bi-plus-circle me-1"></i> Add Question
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Back</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-body p-0">
+            @if (Model.Questions.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var (question, index) in Model.Questions.Select((q, i) => (q, i)))
+                    {
+                        <li class="list-group-item p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1">Question @(index + 1) <span class="badge bg-light text-dark border ms-2">@question.Section</span></h6>
+                                    <p class="mb-0 text-muted">@question.Text</p>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill px-3">Delete</button>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                    <h5 class="text-dark">No questions yet!</h5>
+                    <p class="text-muted">Click the "Add Question" button above to get started.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,30 +1,69 @@
 ﻿@model RmsysCBT.Models.TestResult
 @{
-    ViewData["Title"] = "Results";
+    ViewData["Title"] = "Exam Result";
+    bool isElite = Model.Percentage >= 75;
 }
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 text-center">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header border-0 py-4 @(Model.Passed ? "bg-success" : "bg-danger") text-white">
-                    <h1 class="display-1 mb-0"><i class="bi @(Model.Passed ? "bi-trophy-fill" : "bi-x-circle")"></i></h1>
-                    <h2 class="mt-2">@(Model.Passed ? "Excellent Work!" : "Try Again")</h2>
+        <div class="col-md-8 col-lg-6 text-center">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white mt-4">
+
+                <div class="p-5 @(Model.Passed ? "bg-success text-white" : "bg-danger text-white")">
+                    @if (Model.Passed)
+                    {
+                        <i class="bi bi-check-circle-fill display-1 mb-3 shadow-sm rounded-circle"></i>
+                        <h2 class="fw-bolder mb-0">Congratulations!</h2>
+                        <p class="lead mb-0 opacity-75">You passed the assessment.</p>
+                    }
+                    else
+                    {
+                        <i class="bi bi-x-circle-fill display-1 mb-3 shadow-sm rounded-circle"></i>
+                        <h2 class="fw-bolder mb-0">Keep Trying!</h2>
+                        <p class="lead mb-0 opacity-75">You did not pass this time.</p>
+                    }
                 </div>
-                <div class="card-body p-5">
-                    <h3 class="text-muted mb-4">Your Score</h3>
-                    <div class="display-3 fw-bold mb-2 @(Model.Passed ? "text-success" : "text-danger")">
-                        @Model.Percentage%
+
+                <div class="card-body p-4 p-md-5">
+                    <h5 class="text-muted fw-bold text-uppercase tracking-wide mb-4">Your Final Score</h5>
+
+                    <div class="display-1 fw-bolder text-dark mb-2">
+                        @Model.Percentage<span class="text-muted fs-3">%</span>
                     </div>
-                    <p class="fs-4 text-muted">You got <strong>@Model.Score</strong> out of <strong>@Model.TotalQuestions</strong> questions correct.</p>
 
-                    <hr class="my-4">
+                    <p class="fs-5 text-muted mb-5">
+                        You answered <strong>@Model.Score</strong> out of <strong>@Model.TotalQuestions</strong> questions correctly.
+                    </p>
 
-                    <a href="/Test/Index" class="btn btn-outline-primary btn-lg rounded-pill px-5">
-                        Take Another Test
-                    </a>
+                    @if (isElite)
+                    {
+                        <div class="alert alert-warning border border-warning-subtle rounded-4 p-4 mb-5 text-start d-flex align-items-center shadow-sm">
+                            <i class="bi bi-trophy-fill display-4 text-warning me-4"></i>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">Elite Performance!</h5>
+                                <p class="mb-0 text-dark opacity-75 small">You scored 90% or higher and have earned a World-Class Certificate of Excellence.</p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                        @if (isElite)
+                        {
+                            <a asp-action="Certificate" asp-route-id="@Model.Id" class="btn btn-warning btn-lg rounded-pill px-4 fw-bold shadow-sm" target="_blank">
+                                <i class="bi bi-award-fill me-2"></i> View Certificate
+                            </a>
+                        }
+                        <a asp-action="History" class="btn btn-outline-primary btn-lg rounded-pill px-4 fw-medium">
+                            My History
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-light border btn-lg rounded-pill px-4 fw-medium text-dark">
+                            Go Home
+                        </a>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

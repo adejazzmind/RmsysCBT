@@ -17,13 +17,22 @@ namespace RmsysCBT.Data
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // 2. Create Default Admin (Password: Admin123)
-            var adminEmail = "admin@rmsys.com";
-            if (await userManager.FindByEmailAsync(adminEmail) == null)
+            // 2a. Create First Default Admin (Password: Admin123)
+            var adminEmail1 = "admin@rmsys.com";
+            if (await userManager.FindByEmailAsync(adminEmail1) == null)
             {
-                var admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-                await userManager.CreateAsync(admin, "Admin123");
-                await userManager.AddToRoleAsync(admin, "Admin");
+                var admin1 = new IdentityUser { UserName = adminEmail1, Email = adminEmail1, EmailConfirmed = true };
+                await userManager.CreateAsync(admin1, "Admin123");
+                await userManager.AddToRoleAsync(admin1, "Admin");
+            }
+
+            // 2b. Create Second Admin - Zainab (Password: Admin123)
+            var adminEmail2 = "owoiluzainaboluwatoyin@yahoo.com";
+            if (await userManager.FindByEmailAsync(adminEmail2) == null)
+            {
+                var admin2 = new IdentityUser { UserName = adminEmail2, Email = adminEmail2, EmailConfirmed = true };
+                await userManager.CreateAsync(admin2, "Admin123");
+                await userManager.AddToRoleAsync(admin2, "Admin");
             }
 
             // 3. Create Default Student (Password: Student123)
