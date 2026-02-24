@@ -2,13 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy everything
 COPY . .
 
-# Restore using the solution
-RUN dotnet restore RmsysCBT.sln
+# Restore directly using project file (NOT solution)
+RUN dotnet restore RMSYSCBT.csproj
 
-# Publish using the project
 RUN dotnet publish RMSYSCBT.csproj -c Release -o /app/publish
 
 # Runtime stage
