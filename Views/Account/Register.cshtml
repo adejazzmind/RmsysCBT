@@ -1,0 +1,63 @@
+﻿@model RmsysCBT.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow rounded-4 border-0 p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-person-plus-fill fs-1"></i>
+                    </div>
+                    <h2 class="fw-bolder text-dark mb-0">Create Account</h2>
+                </div>
+
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="All" class="text-danger small fw-bold mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label fw-bold text-muted">Full Name (For your Certificate)</label>
+                        <input asp-for="FullName" class="form-control form-control-lg bg-light" placeholder="e.g. John Doe" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-bold text-muted">Email Address</label>
+                        <input asp-for="Email" class="form-control form-control-lg bg-light" placeholder="name@example.com" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label fw-bold text-muted">Password</label>
+                        <div class="input-group">
+                            <input asp-for="Password" type="password" id="regPassword" class="form-control form-control-lg bg-light border-end-0" placeholder="••••••••" />
+                            <span class="input-group-text bg-light border-start-0" id="toggleRegPassword" style="cursor: pointer;">
+                                <i class="bi bi-eye-fill text-muted" id="regEyeIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const toggleRegPassword = document.getElementById('toggleRegPassword');
+        const regPasswordInput = document.getElementById('regPassword');
+        const regEyeIcon = document.getElementById('regEyeIcon');
+
+        toggleRegPassword.addEventListener('click', function () {
+            // Toggle the type attribute
+            const type = regPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            regPasswordInput.setAttribute('type', type);
+
+            // Toggle the eye icon
+            regEyeIcon.classList.toggle('bi-eye-fill');
+            regEyeIcon.classList.toggle('bi-eye-slash-fill');
+        });
+    </script>
+}

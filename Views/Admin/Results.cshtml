@@ -1,0 +1,64 @@
+﻿@model IEnumerable<RmsysCBT.Models.TestResult>
+@{
+    ViewData["Title"] = "All Student Results";
+}
+
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h2 class="fw-bold text-primary mb-0">
+            <i class="bi bi-people-fill me-2"></i>All Student Results
+        </h2>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="py-3 px-4">Student Email</th>
+                        <th class="py-3">Date Taken</th>
+                        <th class="py-3 text-center">Score</th>
+                        <th class="py-3 text-center">Percentage</th>
+                        <th class="py-3 text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="px-4 fw-bold text-dark">@item.StudentName</td>
+                                <td class="text-muted">@item.TakenOn.ToString("MMM dd, yyyy - hh:mm tt")</td>
+                                <td class="text-center fw-medium">@item.Score / @item.TotalQuestions</td>
+                                <td class="text-center fw-bold">@item.Percentage%</td>
+                                <td class="text-center">
+                                    @if (item.Passed)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2">Passed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2">Failed</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-clipboard-x fs-1 d-block mb-2"></i>
+                                No students have taken any exams yet.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

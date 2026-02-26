@@ -2,44 +2,71 @@
     ViewData["Title"] = "Add Question";
 }
 
-<div class="container py-5 max-w-md" style="max-width: 700px;">
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white p-4 p-md-5">
-        <h3 class="fw-bold text-primary mb-4"><i class="bi bi-patch-question me-2"></i>Add New Question</h3>
-
-        <form asp-action="AddQuestion" method="post">
-            <input type="hidden" name="testId" value="@ViewBag.TestId" />
-
-            <div class="mb-4">
-                <label class="form-label fw-medium text-dark">Question Text</label>
-                <textarea name="questionText" class="form-control rounded-4 px-3 py-2" rows="3" required placeholder="e.g. What does HTML stand for?"></textarea>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-primary mb-0">
+                    <i class="bi bi-question-square-fill me-2"></i>Add Question
+                </h2>
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Dashboard
+                </a>
             </div>
 
-            <div class="mb-5">
-                <label class="form-label fw-medium text-dark">Section / Category (Optional)</label>
-                <input name="section" type="text" class="form-control rounded-pill px-3" value="General" placeholder="e.g. Basics, Advanced, Math..." />
+            <div class="alert alert-info border border-info-subtle rounded-4 mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i> Adding a question to: <strong>@ViewBag.TestTitle</strong>
             </div>
 
-            <div class="p-4 bg-light rounded-4 mb-4 border">
-                <h5 class="fw-bold text-dark mb-3">Options</h5>
-                <p class="text-muted small mb-4"><i class="bi bi-info-circle me-1"></i> Fill in the options and click the radio button next to the <strong>correct</strong> answer.</p>
+            <div class="card border-0 shadow-sm rounded-4 bg-body p-4 p-md-5">
+                <form asp-action="AddQuestion" method="post">
+                    <input type="hidden" name="testId" value="@ViewBag.TestId" />
 
-                @for (int i = 0; i < 4; i++)
-                {
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="form-check me-3 mb-0">
-                            <input class="form-check-input border-secondary" style="width: 1.5rem; height: 1.5rem;" type="radio" name="correctOptionIndex" value="@i" @(i == 0 ? "checked" : "") required>
-                        </div>
-                        <input type="text" name="optionTexts[@i]" class="form-control rounded-pill px-3" placeholder="Option @(i + 1)" required />
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted">Section / Category (Optional)</label>
+                        <input type="text" name="section" class="form-control bg-light" placeholder="e.g. Mathematics, Logic, Programming..." />
                     </div>
-                }
-            </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
-                    <i class="bi bi-save me-1"></i> Save Question
-                </button>
-                <a asp-action="Manage" asp-route-id="@ViewBag.TestId" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted">Question Text</label>
+                        <textarea name="questionText" class="form-control bg-light" rows="3" placeholder="Type your question here..." required></textarea>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">Option A</label>
+                            <input type="text" name="optionA" class="form-control bg-light" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">Option B</label>
+                            <input type="text" name="optionB" class="form-control bg-light" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">Option C</label>
+                            <input type="text" name="optionC" class="form-control bg-light" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted">Option D</label>
+                            <input type="text" name="optionD" class="form-control bg-light" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label fw-bold text-muted">Which option is the Correct Answer?</label>
+                        <select name="correctAnswer" class="form-select form-select-lg bg-light" required>
+                            <option value="" disabled selected>Select the correct answer...</option>
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm">
+                        <i class="bi bi-plus-circle-fill me-2"></i> Save Question
+                    </button>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
